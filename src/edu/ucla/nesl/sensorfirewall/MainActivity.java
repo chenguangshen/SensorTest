@@ -36,8 +36,12 @@ public class MainActivity extends Activity {
     
     public void onBtnClicked(View v){
         if(v.getId() == R.id.button1){
-        	Log.i(LOG_TAG, "Button clicked");
+        	Log.i(LOG_TAG, "Start");
         	mService.testSensor(MainService.ACC);
+        }
+        if(v.getId() == R.id.button2) {
+        	Log.i(LOG_TAG, "Stop");
+        	mService.stopSensor();
         }
     }
 

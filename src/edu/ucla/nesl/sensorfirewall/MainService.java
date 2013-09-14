@@ -5,14 +5,17 @@ package edu.ucla.nesl.sensorfirewall;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MainService extends Service implements SensorEventListener {
 	public static final String LOG_TAG = "MainActivity";
@@ -20,16 +23,12 @@ public class MainService extends Service implements SensorEventListener {
 	private final IBinder mBinder = new LocalBinder();
 	private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private static int count = 0;
-    private static MainService service;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
 		Log.i(LOG_TAG, "in onBind of MainService");
 		mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        service = this;
 		return mBinder;
 	}
 	
@@ -41,44 +40,28 @@ public class MainService extends Service implements SensorEventListener {
 	
 	public void testSensor(String sensorType) {
 		Log.i(LOG_TAG, "in test sensor");
-		count = 0;
+		PackageManager packageManager = this.getPackageManager();
+		try {
+			ApplicationInfo app = packageManager.getApplicationInfo("edu.ucla.nesl.sensorfirewall", PackageManager.GET_META_DATA);
+			Toast.makeText(this, "uid=" + app.uid, Toast.LENGTH_LONG).show();
+		} catch (NameNotFoundException e) {
+			//e.printStackTrace();
+			Toast.makeText(this, "app not found", Toast.LENGTH_LONG).show();
+		}
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-		new CountTime().execute("null");
-		new CountTime().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "null");
+	}
+	
+	public void stopSensor() {
+		mSensorManager.unregisterListener(this);
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
-		count++;
 		Log.i("LOG_TAG", "acc data received " + event.values[0]);
-	}
-	
-	private class CountTime extends AsyncTask<String, Integer, Integer> {
-
-		@Override
-		protected Integer doInBackground(String... arg0) {
-			// TODO Auto-generated method stub
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			mSensorManager.unregisterListener(service);
-			Log.i("LOG_TAG", "sensor event num: " + count);
-			return count;
-		}
-		
-		@Override
-		protected void onPostExecute(Integer result) {
-			super.onPostExecute(result);
-		}	
 	}
 }
