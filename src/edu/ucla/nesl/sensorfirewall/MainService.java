@@ -43,7 +43,7 @@ public class MainService extends Service implements SensorEventListener {
 		Log.i(LOG_TAG, "in test sensor");
 		count = 0;
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-		//new CountTime().execute("null");
+		new CountTime().execute("null");
 		new CountTime().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "null");
 	}
 
@@ -57,7 +57,7 @@ public class MainService extends Service implements SensorEventListener {
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
 		count++;
-		Log.i("LOG_TAG", "acc data received");
+		Log.i("LOG_TAG", "acc data received " + event.values[0]);
 	}
 	
 	private class CountTime extends AsyncTask<String, Integer, Integer> {
