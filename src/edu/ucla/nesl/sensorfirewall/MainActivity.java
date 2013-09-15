@@ -61,9 +61,15 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	@Override
-	public void onPause() {
-		super.onPause();
+	public void onStop() {
+		super.onStop();
+		unbindService(mConnection);
 		mService = null;
 	}
+	
+//	@Override
+//	public void onPause() {
+//		super.onPause();
+//		mService = null;
+//	}
 }

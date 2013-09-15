@@ -5,9 +5,6 @@ package edu.ucla.nesl.sensorfirewall;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,7 +12,6 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MainService extends Service implements SensorEventListener {
 	public static final String LOG_TAG = "MainActivity";
@@ -40,14 +36,6 @@ public class MainService extends Service implements SensorEventListener {
 	
 	public void testSensor(String sensorType) {
 		Log.i(LOG_TAG, "in test sensor");
-		PackageManager packageManager = this.getPackageManager();
-		try {
-			ApplicationInfo app = packageManager.getApplicationInfo("edu.ucla.nesl.sensorfirewall", PackageManager.GET_META_DATA);
-			Toast.makeText(this, "uid=" + app.uid, Toast.LENGTH_LONG).show();
-		} catch (NameNotFoundException e) {
-			//e.printStackTrace();
-			Toast.makeText(this, "app not found", Toast.LENGTH_LONG).show();
-		}
 		mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 	}
 	
@@ -62,6 +50,10 @@ public class MainService extends Service implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		Log.i("LOG_TAG", "acc data received " + event.values[0]);
+		//Log.i("LOG_TAG", "acc data received " + event.values[0]);
+		if (event.values[0] == -2) {
+			Log.d(LOG_TAG, "system time=" + System.nanoTime());
+			stopSensor();
+		}
 	}
 }
